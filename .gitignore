@@ -1,0 +1,7 @@
+.DS_Store
+.vscode
+sfcredentials.js
+npm-debug.log
+node_modules
+package-lock.json
+yarn-error.log

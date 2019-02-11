@@ -1,0 +1,32 @@
+extend main
+
+block header
+  h1 Welcome!
+  p Sign in below
+
+block content
+  .row.justify-content-center
+
+  form(name='loginForm', method='post', action='/')
+    .inputs
+      div.form-group
+        label(for='email') Email
+        input.form-control(type='email', name='email')
+
+      div.form-group
+        label(for='password') Password
+        input.form-control(type='password', name='password')
+
+    p=message
+
+    .button
+      input(type='submit' value='Log In')
+
+block footer
+  p Powered by
+  img.logo(src='/public/img/exesios-logo.png')
+  p.copyrightInfo
+    span.version=version
+    |  ©
+    a(href='https://www.exesios.com/')  Exesios
+

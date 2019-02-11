@@ -1,0 +1,38 @@
+{
+  "name": "accounts-master",
+  "version": "0.0.0",
+  "description": "Main accounts server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:dev": "./node_modules/.bin/nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ExesiosPB/accounts-master.git"
+  },
+  "author": "Toby Drane",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ExesiosPB/accounts-master/issues"
+  },
+  "homepage": "https://github.com/ExesiosPB/accounts-master#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.4",
+    "body-parser": "^1.18.3",
+    "connect-mongo": "^2.0.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "jsonwebtoken": "^8.4.0",
+    "mongoose": "^5.4.10",
+    "nodemon": "^1.18.10",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "pino": "^5.11.1",
+    "pino-pretty": "^2.5.0",
+    "pug": "^2.0.3",
+    "validator": "^10.11.0"
+  }
+}

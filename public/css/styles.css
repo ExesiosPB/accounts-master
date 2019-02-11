@@ -1,0 +1,91 @@
+@font-face {
+  font-family: 'Muli';
+  src: local('Muli-Regular.ttf'), url('../fonts/Muli/Muli-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Muli';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Muli-Bold.ttf'), url('../fonts/Muli/Muli-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Muli';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Muli-Italic.ttf'), url('../fonts/Muli/Muli-Italic.ttf');
+}
+
+body {
+  font-family: "Muli", Helvetica, Arial, sans-serif;
+  color: #2d3741;
+}
+
+a {
+  color: #2d3741;
+}
+
+.header h1 {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.container {
+  max-width: 500px;
+  padding: 50px;
+  text-align: center;
+}
+
+input {
+  outline: none;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.content {
+  background: #fff;
+  padding: 30px 20px;
+  align-content: center;
+  text-align: left;
+
+  border-top: solid 1px #959b9f;
+  border-bottom: solid 1px #959b9f;
+}
+
+.content .inputs {
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+}
+
+.button input {
+  display: block;
+  margin: 0 auto;
+  padding: 5px 15px;
+  color: #2d3741;
+  background-color: white;
+  border: solid 1px #ced4da;
+}
+
+.footer {
+  margin-top: 10px;
+}
+
+.footer p {
+  font-size: 13px;
+  color: #2d3741 !important;
+}
+
+.footer .logo {
+  max-width: 150px;
+  max-height: 100px;
+  width: auto;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.footer .copyrightInfo {
+  font-size: 10px;
+}
