@@ -8,8 +8,8 @@ Users are redirected to this URL to log in and log out the dashboard.
 ## How does logging in work?
 
 1. When not logged in to the dashboard (and when the JWT token expires 3h), the user is redirected to /login on accounts server
-2. The user sees a log in form on the accounts server and logs in. The user is redirected to /token, this creates a JWT token agaisnt their email addresses that lasts 3 hours.
-3. This token is stored in db.tokens and then they are redirected to dashboard.placingthebrand.com
+2. The user sees a log in form on the accounts server and logs in. The user is redirected to /token, this creates a token against their email address saved in database.
+3. They are then redirected to dashboard.placingthebrand.com which checks the session token. If the token is valid it sends a request to /token/{TOKEN} on the accounts server, this creates a JWT token that lasts for 3 hours and is stored in dashboard and is stored in db.session on accounts server
 4. Redux middleware checks if session is valid
 
 ## How does logging out work?
