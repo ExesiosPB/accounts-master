@@ -34,6 +34,8 @@ For now it will just be a NodeJS application deployed to a server, with the acco
 
 ```process.env.DB_NAME``` - Name of the database table defaults too pb_accounts
 
+```process.env.MONGODB_URI``` - The URL of the db that mongodb provides
+
 ```process.env.SERVER_PORT``` - Port number to host server on
 
 

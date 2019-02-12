@@ -19,7 +19,8 @@ const host = process.env.DB_HOST || 'localhost';
 const port = process.env.DB_PORT || 27017;
 const dbName = process.env.DB_NAME || 'pb_accounts';
 
-const dbUrl = `mongodb://${host}:${port}/${dbName}`;
+const url = `mongodb://${host}:${port}/${dbName}`;
+const dbUrl = process.env.MONGODB_URI || url;
 
 // Main server
 const serverApp = express();
