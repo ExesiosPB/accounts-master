@@ -1,0 +1,38 @@
+extend main
+
+block scripts
+  script(src='/public/js/admin.js')
+  link(href='/public/css/admin.css', rel='stylesheet')
+
+block header
+  h1 Admin area
+
+block content
+  .row
+    p Add a new user:
+    
+    form(name='newUser', method='post', action='/admin/createUser')
+      .inputs
+        div.form-group
+          label(for='fullname') Fullname
+          input.form-control(type='text', name='fullname' required)
+
+        div.form-group
+          label(for='email') Email
+          input.form-control(type='email', name='email' required)
+
+        div.form-group
+          label(for='password1') Password
+          input.form-control(type='password', name='password1' required)
+
+        div.form-group
+          label(for='password2') Confirm Password
+          input.form-control(type='password', name='password2' required)
+
+      if messages
+        each message in messages
+          .message 
+            p=message.text
+
+      .button
+        input(type='submit' value='Create User')

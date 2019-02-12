@@ -11,7 +11,7 @@ const MongoStore = require('connect-mongo')(session);
 
 const messages = require('./middleware/messages');
 const logger = require('./util/logger');
-const adminRoutes = require('./routes/server');
+const adminRoutes = require('./routes/admin');
 const serverRoutes = require('./routes/server');
 
 // Database Variables

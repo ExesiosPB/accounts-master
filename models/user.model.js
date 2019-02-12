@@ -18,6 +18,10 @@ const UserSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  passwordResetRequired: {
+    type: Boolean,
+    default: true
   }
 });
 
