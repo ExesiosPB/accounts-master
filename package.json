@@ -1,6 +1,6 @@
 {
   "name": "accounts-master",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Main accounts server",
   "main": "server.js",
   "scripts": {
