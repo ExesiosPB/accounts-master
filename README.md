@@ -26,7 +26,15 @@ For now it will just be a NodeJS application deployed to a server, with the acco
 
 ## Enviroment Variables
 
-```process.env.DB_HOST, process.env.DB_PORT, process.env.DB_NAME``` Database connection config
+```process.env.DASHBOARD_HOST``` - Placing The Brand dashboard app url, should normally be dashboard.placingthebrand.com but defaults to http://localhost:8080
+
+```process.env.DB_HOST``` - Name of the database host defaults to localhost
+
+```process.env.DB_PORT``` - Port that the database is hosted on defaults to 27017
+
+```process.env.DB_NAME``` - Name of the database table defaults too pb_accounts
+
+```process.env.SERVER_PORT``` - Port number to host server on
 
 
 https://stackoverflow.com/questions/36948557/how-to-use-redux-to-refresh-jwt-token
