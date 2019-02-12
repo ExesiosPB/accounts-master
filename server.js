@@ -11,6 +11,7 @@ const MongoStore = require('connect-mongo')(session);
 
 const messages = require('./middleware/messages');
 const logger = require('./util/logger');
+const adminRoutes = require('./routes/server');
 const serverRoutes = require('./routes/server');
 
 // Database Variables
@@ -20,7 +21,7 @@ const dbName = process.env.DB_NAME || 'pb_accounts';
 
 const dbUrl = `mongodb://${host}:${port}/${dbName}`;
 
-// Main Server
+// Main server
 const serverApp = express();
 const serverPort = process.env.SERVER_PORT || 3002;
 
@@ -35,7 +36,7 @@ const sessionOpts = {
   cookie: {
     maxAge: sessionDuration,
     httpOnly: true,
-    secure: true,
+    secure: false,
   },
 };
 
@@ -76,9 +77,10 @@ function launchAccountsServer() {
   
   serverApp.use(session(sessionOpts));
   serverApp.use(messages);
+  serverApp.use(serverRoutes);
+  serverApp.use('/admin', adminRoutes);
   serverApp.set('view engine', 'pug');
   serverApp.use('/public', express.static(path.join(__dirname, 'public')));
-  serverApp.use(serverRoutes);
   serverApp.listen(serverPort, () => {
     logger.info(`Accounts server listening on port ${serverPort}`);
   });

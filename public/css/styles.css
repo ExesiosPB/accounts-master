@@ -60,6 +60,13 @@ input {
   width: 70%;
 }
 
+.message {
+  text-align: center;
+  color: red;
+  font-size: 15px;
+  font-weight: 700;
+}
+
 .button input {
   display: block;
   margin: 0 auto;
