@@ -36,7 +36,7 @@ For now it will just be a NodeJS application deployed to a server, with the acco
 
 ```process.env.MONGODB_URI``` - The URL of the db that mongodb provides
 
-```process.env.SERVER_PORT``` - Port number to host server on
+```process.env.PORT``` - Port number to host server on
 
 
 https://stackoverflow.com/questions/36948557/how-to-use-redux-to-refresh-jwt-token

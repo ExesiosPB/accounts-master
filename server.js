@@ -24,7 +24,7 @@ const dbUrl = process.env.MONGODB_URI || url;
 
 // Main server
 const serverApp = express();
-const serverPort = process.env.SERVER_PORT || 3002;
+const serverPort = process.env.PORT || 3002;
 
 // Set up session options
 // See express-session details for info
