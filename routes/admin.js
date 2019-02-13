@@ -2,6 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcrypt');
 
 const logger = require('../util/logger');
+const validatePassword = require('../util/validate');
 const User = require('../models/user.model');
 
 // we make sure that the admin page can only be accessed by admins
@@ -43,9 +44,8 @@ function createUser(req, res) {
             password: password1,
           })
 
-          // Now encrypt passwords
           const saltRounds = 10;
-          bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.genSalt(saltRounds, (err, salt) => {
             if (err) {
               createUserError(err, 'Password salt error');
             } else {
@@ -83,21 +83,13 @@ function createUser(req, res) {
   }
 }
 
-function validatePassword(password1, password2) {
-  if (password1 !== password2) {
-    return 'Passwords don\'t match';
-  } else if (password1.length < 8 || password1.length > 20) {
-    return 'Password must be between 8 and 20 characters';
-  } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/.test(password1)) {
-    return 'Password must contain one lowercase and uppercase letter, and at least one number';
-  }
-}
-
 // Checks to see if a user has logged in
 function checkForLogin(req, res, next) {
   if (req.session.user) {
     next();
   } else {
+    // We need to save this url to redirect later
+    req.session.redirectUrl = '/admin';
     // No user logged in so redirect them to login
     // not outside admin page
     res.redirect('/');

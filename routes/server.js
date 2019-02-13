@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const logger = require('../util/logger');
+const validatePassword = require('../util/validate');
 const info = require('../util/info');
 const User = require('../models/user.model');
 const Token = require('../models/token.model');
@@ -31,6 +33,15 @@ router.get('/login', (req, res) => {
 // Route to generate new check token
 router.get('/token', generateToken);
 
+router.post('/resetPassword', resetPassword);
+router.get('/resetPassword', (req, res) => {
+  const messages = res.getMessages();
+  res.locals.messages = messages;
+  res.render('resetPassword', {
+    version: info.version,
+  });
+});
+
 function checkForUser(req, res, next) {
   // If they have user, next check
   if (req.session.user) {
@@ -41,9 +52,36 @@ function checkForUser(req, res, next) {
   }
 }
 
-// Redirect user to /token to generate knew token
+// Redirect user to destinations
+// if they have come from somewhere session.redirectUrl
+// /resetPassword
+// /token
 function redirectUser(req, res, next) {
-  res.redirect('/token');
+  // Have they come here from somewhere else
+  if (req.session.redirectUrl) {
+    const url = req.session.redirectUrl;
+    delete req.session.redirectUrl;
+    res.redirect(url);
+  } else {
+    // Otherwise check for user stuff
+    const email = req.session.user.email;
+    User.findOne({ email: email }).then((user) => {
+      if (user) {
+        const resetRequired = user.passwordResetRequired;
+        // User needs to reset password
+        if (resetRequired) {
+          res.redirect('/resetPassword');
+        } else {
+          res.redirect('/token');
+        }
+      } else {
+        logger.info('Redirect User, user doesnt exist');
+        res.redirect('/login');
+      }
+    }).catch((err) => {
+      logger.info('Redirect user, user find error', err);
+    });  
+  }
 }
 
 // Function to deal with email and password login
@@ -55,10 +93,20 @@ function doLogin(req, res) {
     // Find the user in the database
     User.findOne({ email: req.body.email }).then((user) => {
       if (user) {
-        // Now store the user in the session
-        req.session.user = user;
-        // and then redirect
-        res.redirect('/');
+        // Check the passwords
+        bcrypt.compare(password, user.password).then((isMatch) => {
+          if (isMatch) {
+            // Now store the user in the session
+            req.session.user = user;
+            // and then redirect
+            res.redirect('/');            
+          } else {
+            loginFailed('Password Incorrect');
+          }
+        }).catch((err) => {
+          loginFailed('Password error');
+        })
+
       } else {
         loginFailed('User not found');
       }
@@ -122,6 +170,66 @@ function generateToken(req, res, next) {
   function tokenError(message, error) {
     logger.error(message, error);
     res.redirect('/');
+  }
+}
+
+// Handles the password reset logic
+function resetPassword(req, res) {
+  if (req.session.user) {
+    const email = req.body.email;
+    const password1 = req.body.password1;
+    const password2 = req.body.password2;
+    // Must have all info
+    if (email && password1 && password2) {
+      if (req.session.user.email === email) {
+        
+        // Check passwords
+        const passwordError = validatePassword(password1, password2);
+        if (passwordError) {
+          logger.info('Password error');
+          res.addMessage(passwordError);
+          res.redirect('/resetPassword');
+        } else {
+          // Encrypt password
+          const saltRounds = 10;
+          bcrypt.genSalt(saltRounds, (err, salt) => {
+            if (err) {
+              logger.info('Password salt error', err);
+              res.redirect('/login');
+            } else {
+              bcrypt.hash(password1, salt, (hashErr, hash) => {
+                if (hashErr) {
+                  logger.info('Password hash error', hashErr);
+                  res.redirect('/login');
+                } else {
+                  // Now update
+                  User.findOneAndUpdate({ email }, { 
+                    password: hash, 
+                    passwordResetRequired: false 
+                  }, { new: true }).then((product) => {
+                    
+                    if (product) {
+                      logger.info('Password updated successfully');
+                      res.addMessage('Password resetted!');
+                      res.redirect('/login');
+                    } else {
+                      logger.info('Password update error');
+                      res.redirect('/');
+                    }
+                  }).catch((err) => {
+                    logger.info('Update user error', err);
+                    res.addMessage('Update failed');
+                    res.redirect('/resetPassword');
+                  });
+                }
+              });
+            }
+          });
+        }
+      }
+    } else {
+      res.redirect('/login');
+    }
   }
 }
 
