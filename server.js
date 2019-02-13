@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo')(session);
+const cors = require('cors');
 
 const messages = require('./middleware/messages');
 const logger = require('./util/logger');
@@ -69,6 +70,7 @@ function launchAccountsServer() {
   
   logger.info('Starting accounts REST API...');
 
+  serverApp.use(cors());
   serverApp.set('trust proxy', true);
 
   // Parse requests of content-type: application/x-www-form-urlencoded

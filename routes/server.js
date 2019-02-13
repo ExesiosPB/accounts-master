@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const uuid = require('uuid/v4');
 
 const logger = require('../util/logger');
 const validatePassword = require('../util/validate');
@@ -31,7 +32,10 @@ router.get('/login', (req, res) => {
 });
 
 // Route to generate new check token
-router.get('/token', generateToken);
+router.get('/checkToken', generateCheckToken);
+// Route o get final JWT token from check token
+// NOTE: this returns a json with a JWT token
+router.get('/token/:token', generateFinalToken);
 
 router.post('/resetPassword', resetPassword);
 router.get('/resetPassword', (req, res) => {
@@ -41,6 +45,9 @@ router.get('/resetPassword', (req, res) => {
     version: info.version,
   });
 });
+
+// Handle logout
+router.get('/logout', handleLogout);
 
 function checkForUser(req, res, next) {
   // If they have user, next check
@@ -72,7 +79,7 @@ function redirectUser(req, res, next) {
         if (resetRequired) {
           res.redirect('/resetPassword');
         } else {
-          res.redirect('/token');
+          res.redirect('/checkToken');
         }
       } else {
         logger.info('Redirect User, user doesnt exist');
@@ -129,37 +136,25 @@ function doLogin(req, res) {
 }
 
 // Generate new check token if user has logged in
-function generateToken(req, res, next) {
+function generateCheckToken(req, res) {
   if (req.session.user) {
     const userEmail = req.session.user.email;
 
     // Check if there is already a token for this person in db
     Token.deleteMany({ email: userEmail }).then(() => {
-      // The JWT payload
-      const payload = {
-        email: userEmail
-      }
-      // Create jwt token
-      // payload, secretKey, [options, callback]
-      jwt.sign(payload, 'shhh_placebranding', { expiresIn: '3h' }, (err, token) => {
-        if (err) {
-          tokenError('Token creation error', err);
-        } else {
-          // Now create new token
-          const newToken = new Token({
-            email: userEmail,
-            token: token,
-          });
-
-          // Save new token to the database
-          newToken.save().then((product) => {
-            // Redirect to dashboard site
-            res.send(`<script>window.location.href = '${dashboardURL}'</script>Redirecting...`);
-          }).catch((err) => {
-            tokenError('Token save error', err);
-          });
-        }
-      });
+      // Create new random token
+      const token = uuid();
+      
+      // Save token in database
+      const newTokenCollection = new Token({
+        email: userEmail,
+        token: token,
+      }).save().then((product) => {
+        // Redirect to dashboard site /auth/:TOKEN
+        res.send(`<script>window.location.href = '${dashboardURL}/auth/${token}'</script>Redirecting...`);  
+      }).catch((err) => {
+        tokenError('Token save error', err);
+      })
     }).catch((err) => {
       tokenError('Token delete error', err);
     });
@@ -173,7 +168,36 @@ function generateToken(req, res, next) {
   }
 }
 
+// Generates final token, removes the check token from database and returns jwt
+// NOTE: This is unlike other routes it returns a JSON
+function generateFinalToken(req, res) {
+  const urlToken = req.params.token;
+  // Find token
+  Token.findOneAndRemove({ token: urlToken }).then((product) => {
+    if (!product) {
+      logger.error('Token delete error');
+      res.status(422).json({ error: 'Token Invalid' });
+    } else {
+      // The JWT payload
+      const payload = { email: product.email };
+      // Create jwt token
+      // payload, secretKey, [options, callback]
+      jwt.sign(payload, 'shhh_placebranding', { expiresIn: '3h' }, (err, token) => {
+        if (err) {
+          res.status(422).json({ error: 'Token error'});
+        } else {
+          res.json({ token });
+        }
+      });
+    }
+  }).catch((err) => {
+    logger.error('Token delete error', err);
+    res.status(422).json(err);
+  });
+}
+
 // Handles the password reset logic
+// TODO: Clean this up, we have so many redirects ugh!!
 function resetPassword(req, res) {
   if (req.session.user) {
     const email = req.body.email;
@@ -230,6 +254,23 @@ function resetPassword(req, res) {
     } else {
       res.redirect('/login');
     }
+  }
+}
+
+function handleLogout(req, res) {
+  if (req.session.user) {
+    logger.info('Logging user out...');
+    req.session.destroy((err) => {
+      if (err) {
+        logger.info('Problem with logging user out', err);
+        res.redirect('/');
+      } else {
+        logger.info('User logged out');
+        res.redirect('/');
+      }
+    });
+  } else {
+    res.redirect('/');
   }
 }
 
