@@ -151,7 +151,8 @@ function generateCheckToken(req, res) {
         token: token,
       }).save().then((product) => {
         // Redirect to dashboard site /auth/:TOKEN
-        res.send(`<script>window.location.href = '${dashboardURL}/auth/${token}'</script>Redirecting...`);  
+        res.send(`<script>window.location.href = '${dashboardURL}/auth/${token}'</script>
+          Redirecting..."`);  
       }).catch((err) => {
         tokenError('Token save error', err);
       })
